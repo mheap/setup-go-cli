@@ -1,0 +1,22 @@
+name: Setup Go CLI
+description: Install any goreleaser based CLI in GitHub Actions
+runs:
+  using: node20
+  main: dist/index.js
+inputs:
+  owner:
+    description: The user/org name to fetch the tool from
+    required: true
+  repo:
+    description: The repository name to fetch the tool from
+    required: true
+  cli_name:
+    description: The name of the CLI (may be different to repo)
+    required: true
+  version:
+    description: The version to install
+    required: false
+  token:
+    description: The GitHub token to use when fetching the latest version of the tool
+    default: ${{ github.token }}
+    required: false
