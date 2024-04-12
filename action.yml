@@ -16,6 +16,12 @@ inputs:
   version:
     description: The version to install
     required: false
+  package_name_template:
+    description: Allows you to customise the package name using a template
+    required: false
+  package_type:
+    description: The package archive type (.tar.gz, .zip)
+    required: false
   token:
     description: The GitHub token to use when fetching the latest version of the tool
     default: ${{ github.token }}
