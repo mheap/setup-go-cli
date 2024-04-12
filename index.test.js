@@ -17,6 +17,7 @@ beforeEach(() => {
     INPUT_OWNER: "mheap",
     INPUT_REPO: "demo-cli",
     INPUT_CLI_NAME: "demo",
+    INPUT_PACKAGE_NAME_TEMPLATE: "{{name}}_{{version}}_{{os}}_{{arch}}",
   });
   restoreTest = () => {};
 

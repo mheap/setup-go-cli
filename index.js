@@ -8,6 +8,14 @@ async function action() {
   let repo = core.getInput("repo", { required: true });
   let cliName = core.getInput("cli_name", { required: true });
   let version = core.getInput("version", { required: false });
+  let packageNameTemplate = core.getInput("package_name_template", {
+    required: false,
+  });
+
+  // Taken from https://github.com/sundowndev/goreleaser-template/blob/main/.goreleaser.yml#L63
+  if (!packageNameTemplate) {
+    packageNameTemplate = "{{name}}_{{os}}_{{arch}}";
+  }
 
   if (!version) {
     // Fetch the latest release version
@@ -50,9 +58,16 @@ async function action() {
   const fullVersion = `${semverVersion}-${os}`;
   console.log(`Installing ${cliName} version ${fullVersion}`);
 
+  const packageName = interpolate(packageNameTemplate, {
+    name: cliName,
+    version: semverVersion,
+    os,
+    arch,
+  });
+
   let toolDirectory = tc.find(cliName, fullVersion);
   if (!toolDirectory) {
-    const versionUrl = `https://github.com/${owner}/${repo}/releases/download/v${semverVersion}/${cliName}_${semverVersion}_${os}_${arch}.tar.gz`;
+    const versionUrl = `https://github.com/${owner}/${repo}/releases/download/v${semverVersion}/${packageName}.tar.gz`;
     const toolPath = await tc.downloadTool(versionUrl);
 
     const toolExtractedFolder = await tc.extractTar(
@@ -89,6 +104,9 @@ function getArch(arch) {
 
   return process.arch;
 }
+
+const interpolate = (string, values) =>
+  string.replace(/{{(.*?)}}/g, (match, offset) => values[offset]);
 
 if (require.main === module) {
   action();
