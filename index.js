@@ -1,3 +1,4 @@
+const fs = require("fs");
 const tc = require("@actions/tool-cache");
 const core = require("@actions/core");
 const github = require("@actions/github");
@@ -87,6 +88,9 @@ async function action() {
         toolPath,
         `${cliName}-${fullVersion}`
       );
+
+      // Make it executable
+      fs.chmodSync(path.join(toolExtractedFolder, cliName), "755");
     } else {
       throw new Error(`Unsupported package type: ${packageType}`);
     }
