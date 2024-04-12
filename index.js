@@ -11,10 +11,15 @@ async function action() {
   let packageNameTemplate = core.getInput("package_name_template", {
     required: false,
   });
+  let packageType = core.getInput("package_type", { required: false });
 
   // Taken from https://github.com/sundowndev/goreleaser-template/blob/main/.goreleaser.yml#L63
   if (!packageNameTemplate) {
     packageNameTemplate = "{{name}}_{{os}}_{{arch}}";
+  }
+
+  if (!packageType) {
+    packageType = "tar.gz";
   }
 
   if (!version) {
@@ -67,13 +72,24 @@ async function action() {
 
   let toolDirectory = tc.find(cliName, fullVersion);
   if (!toolDirectory) {
-    const versionUrl = `https://github.com/${owner}/${repo}/releases/download/v${semverVersion}/${packageName}.tar.gz`;
+    const versionUrl = `https://github.com/${owner}/${repo}/releases/download/v${semverVersion}/${packageName}.${packageType}`;
     const toolPath = await tc.downloadTool(versionUrl);
 
-    const toolExtractedFolder = await tc.extractTar(
-      toolPath,
-      `${cliName}-${fullVersion}`
-    );
+    let toolExtractedFolder;
+
+    if (packageType === "tar.gz") {
+      toolExtractedFolder = await tc.extractTar(
+        toolPath,
+        `${cliName}-${fullVersion}`
+      );
+    } else if (packageType === "zip") {
+      toolExtractedFolder = await tc.extractZip(
+        toolPath,
+        `${cliName}-${fullVersion}`
+      );
+    } else {
+      throw new Error(`Unsupported package type: ${packageType}`);
+    }
 
     toolDirectory = await tc.cacheDir(
       toolExtractedFolder,
