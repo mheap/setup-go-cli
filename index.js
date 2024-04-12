@@ -1,4 +1,5 @@
 const fs = require("fs");
+const path = require("path");
 const tc = require("@actions/tool-cache");
 const core = require("@actions/core");
 const github = require("@actions/github");
